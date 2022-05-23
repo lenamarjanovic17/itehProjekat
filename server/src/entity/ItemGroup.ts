@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Item } from "./Item";
 
 
@@ -16,8 +16,5 @@ export class ItemGroup {
 
   @OneToMany(() => ItemGroup, g => g.parentGroup)
   children: ItemGroup[]
-
-  @OneToMany(() => Item, i => i.itemGroup)
-  items: Item[];
 
 }

@@ -23,7 +23,7 @@ export class Item {
   @Column()
   price: number
 
-  @ManyToOne(() => ItemGroup, g => g.items)
+  @ManyToOne(() => ItemGroup)
   itemGroup: ItemGroup;
 
   @Column({
