@@ -11,9 +11,8 @@ import { User } from "./entity/User";
 
 AppDataSource.initialize().then(async () => {
 
-    // const key = fs.readFileSync('./key.pem', 'utf8');
-    // const cert = fs.readFileSync('./cert.pem', 'utf8');
-    // create express app
+    const key = fs.readFileSync('./key.pem', 'utf8');
+    const cert = fs.readFileSync('./cert.pem', 'utf8');
     const app = express();
     app.use(express.json());
     app.use(cors({
@@ -50,7 +49,7 @@ AppDataSource.initialize().then(async () => {
     app.post('/register', async (req, res) => {
         let user = await AppDataSource.getRepository(User).findOne({
             where: {
-                email: req.body
+                email: req.body.email
             }
         });
         if (user) {
@@ -63,14 +62,14 @@ AppDataSource.initialize().then(async () => {
         res.json(user);
     })
 
-    // app.use((request, response, next) => {
-    //     const user = (request.session as any).user as User | undefined;
-    //     if (!user) {
-    //         response.status(401).json({ error: 'Unauthorized' })
-    //         return;
-    //     }
-    //     next();
-    // });
+    app.use((request, response, next) => {
+        const user = (request.session as any).user as User | undefined;
+        if (!user) {
+            response.status(401).json({ error: 'Unauthorized' })
+            return;
+        }
+        next();
+    });
 
     app.get('/check', async (req, res) => {
         res.json((req.session as any).user);
@@ -95,13 +94,13 @@ AppDataSource.initialize().then(async () => {
         app[route.method](route.url, ...route.handler);
     }
 
-    // const server = https.createServer({
-    //     key: key,
-    //     cert: cert,
-    // }, app)
+    const server = https.createServer({
+        key: key,
+        cert: cert,
+    }, app)
 
 
-    app.listen(8000, () => {
+    server.listen(8000, () => {
         console.log('Server is listening on https://localhost:8000')
     })
 

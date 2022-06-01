@@ -1,26 +1,72 @@
-import React from 'react';
-import logo from './logo.svg';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
-
+import Home from './components/Home';
+import 'rsuite/dist/rsuite.min.css'
+import Login from './components/Login';
+import Register from './components/Register';
+import UserNavbar from './components/UserNavbar';
+import { User } from './types';
+import ShopPage from './components/ShopPage';
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL = 'https://localhost:8000';
 function App() {
+  const [user, setUser] = useState<User | undefined>(undefined);
+
+  useEffect(() => {
+    axios.get('/check').then(res => {
+      setUser(res.data);
+    })
+  }, [])
+
+
+  const onLogout = async () => {
+    await axios.post('/logout');
+    setUser(undefined);
+  }
+
+  if (!user) {
+    return (
+      <BrowserRouter>
+        <div className='app-container'>
+          <Routes>
+            <Route path='*' element={<Login onSubmit={async val => {
+              const res = await axios.post('/login', val);
+              setUser(res.data);
+            }} />} />
+            <Route path='/register' element={<Register onSubmit={async val => {
+              const res = await axios.post('/register', val);
+              setUser(res.data);
+            }} />} />
+          </Routes>
+        </div>
+      </BrowserRouter>
+    )
+  }
+  if (!user.admin) {
+    return (
+      <UserApp user={user} onLogout={onLogout} />
+    )
+  }
+  return null;
+}
+interface UserProps {
+  user: User,
+  onLogout: () => void
+}
+function UserApp(props: UserProps) {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <BrowserRouter>
+      <UserNavbar onLogout={props.onLogout} user={props.user} />
+      <div className='app-container'>
+        <Routes>
+          <Route path='*' element={(<Home />)} />
+          <Route path='/shop' element={(<ShopPage />)} />
+        </Routes>
+      </div>
+    </BrowserRouter>
+  )
 }
 
 export default App;

@@ -56,3 +56,16 @@ export interface User {
   phone: string,
   admin: boolean
 }
+
+export interface LoginUser {
+  email: string,
+  password: string
+}
+export interface RegisterUser {
+  firstName: string,
+  lastName: string,
+  email: string,
+  phone: string,
+  repeat: string,
+  password: string
+}
