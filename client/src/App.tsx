@@ -9,6 +9,7 @@ import Register from './components/Register';
 import UserNavbar from './components/UserNavbar';
 import { User } from './types';
 import ShopPage from './components/ShopPage';
+import ItemShowPage from './components/ItemShowPage';
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = 'https://localhost:8000';
 function App() {
@@ -59,13 +60,20 @@ function UserApp(props: UserProps) {
   return (
     <BrowserRouter>
       <UserNavbar onLogout={props.onLogout} user={props.user} />
-      <div className='app-container'>
-        <Routes>
-          <Route path='*' element={(<Home />)} />
-          <Route path='/shop' element={(<ShopPage />)} />
-        </Routes>
-      </div>
-    </BrowserRouter>
+      <Routes>
+        <Route path='*' element={(
+          <div className='app-container'>
+            <Home />
+          </div>
+        )} />
+        <Route path='/shop' element={(<ShopPage />)} />
+        <Route path='/item/:id' element={(
+          <div className='app-container' >
+            <ItemShowPage />
+          </div>
+        )} />
+      </Routes>
+    </BrowserRouter >
   )
 }
 

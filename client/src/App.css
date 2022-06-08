@@ -6,3 +6,9 @@
   padding: 0 10%;
   height: 100vh;
 }
+.item-card{
+  margin-bottom: 20px;
+  padding: 20px;
+  border: 1px #142041 solid;
+  border-radius: 10px;
+}

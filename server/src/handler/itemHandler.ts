@@ -36,8 +36,8 @@ export async function getItems(req: Request, res: Response) {
       }
     }
     getIds(gr);
-    queryBuilder.where(`group.id IN (...:groupIds)`)
-
+    console.log(groupIds)
+    queryBuilder.where(`group.id IN (:...groupIds)`)
       .setParameter('groupIds', groupIds);
   }
   queryBuilder.limit(size).offset(page * size);
@@ -47,6 +47,19 @@ export async function getItems(req: Request, res: Response) {
     data,
     total: count
   })
+}
+
+export async function getOneItem(req: Request, res: Response) {
+  res.json(await AppDataSource.getRepository(Item)
+    .findOne({
+      where: {
+        id: Number(req.params.id),
+      },
+      relations: {
+        itemGroup: true
+      }
+    }))
+
 }
 
 export async function createItem(req: Request, res: Response) {

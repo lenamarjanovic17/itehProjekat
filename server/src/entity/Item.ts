@@ -29,7 +29,11 @@ export class Item {
   @Column({
     type: 'json',
     transformer: {
-      from: val => JSON.parse(val),
+      from: val => {
+        console.log(val)
+        console.log(typeof val)
+        return JSON.parse(val)
+      },
       to: val => JSON.stringify(val)
     }
   })
