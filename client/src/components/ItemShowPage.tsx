@@ -1,10 +1,14 @@
 import React from 'react'
 import { useNavigate, useParams } from 'react-router'
-import { Table } from 'rsuite';
+import { Button, Table } from 'rsuite';
 import useGet from '../hooks/useGet';
 import { Item, Specification } from '../types';
 
-export default function ItemShowPage() {
+interface Props {
+  addToCart: (item: Item) => void
+}
+
+export default function ItemShowPage(props: Props) {
   const params = useParams();
   const id = Number(params.id);
   const navigate = useNavigate();
@@ -40,6 +44,7 @@ export default function ItemShowPage() {
             )
           }
         </div>
+        <Button appearance='primary' style={{ marginTop: '20px' }} onClick={() => { props.addToCart(item!) }}>Add to cart</Button>
       </div>
     </div>
   )

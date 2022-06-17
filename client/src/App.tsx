@@ -7,9 +7,10 @@ import 'rsuite/dist/rsuite.min.css'
 import Login from './components/Login';
 import Register from './components/Register';
 import UserNavbar from './components/UserNavbar';
-import { User } from './types';
+import { CartItems, Item, User } from './types';
 import ShopPage from './components/ShopPage';
 import ItemShowPage from './components/ItemShowPage';
+import CartPage from './components/CartPage';
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = 'https://localhost:8000';
 function App() {
@@ -57,6 +58,21 @@ interface UserProps {
   onLogout: () => void
 }
 function UserApp(props: UserProps) {
+  const [cartItems, setCartItems] = useState<CartItems>({})
+
+
+  const changeItem = (item: Item, val: number, merge = true) => {
+    setCartItems(prev => {
+      return {
+        ...prev,
+        [item.id!]: {
+          count: (merge && prev[item.id!]?.count || 0) + val,
+          item
+        }
+      }
+    })
+  }
+
   return (
     <BrowserRouter>
       <UserNavbar onLogout={props.onLogout} user={props.user} />
@@ -67,9 +83,20 @@ function UserApp(props: UserProps) {
           </div>
         )} />
         <Route path='/shop' element={(<ShopPage />)} />
+        <Route path='/cart' element={(
+          <div className='app-container'>
+            <CartPage cartItems={cartItems}
+              onItemChange={(item, val) => {
+                changeItem(item, val, false);
+              }}
+            />
+          </div>
+        )} />
         <Route path='/item/:id' element={(
           <div className='app-container' >
-            <ItemShowPage />
+            <ItemShowPage addToCart={id => {
+              changeItem(id, 1);
+            }} />
           </div>
         )} />
       </Routes>
