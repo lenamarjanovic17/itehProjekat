@@ -75,3 +75,8 @@ export interface CartItems {
     item: Item
   }
 }
+
+export interface ItemsRes {
+  data: Item[],
+  total: number
+}

@@ -7,10 +7,11 @@ import 'rsuite/dist/rsuite.min.css'
 import Login from './components/Login';
 import Register from './components/Register';
 import UserNavbar from './components/UserNavbar';
-import { CartItems, Item, User } from './types';
+import { CartItems, Item, TargetLocation, User } from './types';
 import ShopPage from './components/ShopPage';
 import ItemShowPage from './components/ItemShowPage';
 import CartPage from './components/CartPage';
+import AdminApp from './components/admin/AdminApp';
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = 'https://localhost:8000';
 function App() {
@@ -51,7 +52,9 @@ function App() {
       <UserApp user={user} onLogout={onLogout} />
     )
   }
-  return null;
+  return (
+    <AdminApp user={user} onLogout={onLogout} />
+  );
 }
 interface UserProps {
   user: User,
@@ -73,6 +76,19 @@ function UserApp(props: UserProps) {
     })
   }
 
+  const orderUp = async (tl: Partial<TargetLocation>) => {
+    await axios.post('/order', {
+      targetLocation: tl,
+      orderItems: Object.keys(cartItems).map((key: string) => {
+        return {
+          itemId: Number(key),
+          count: cartItems[key as any].count
+        }
+      })
+    });
+    setCartItems({});
+  }
+
   return (
     <BrowserRouter>
       <UserNavbar onLogout={props.onLogout} user={props.user} />
@@ -85,7 +101,9 @@ function UserApp(props: UserProps) {
         <Route path='/shop' element={(<ShopPage />)} />
         <Route path='/cart' element={(
           <div className='app-container'>
-            <CartPage cartItems={cartItems}
+            <CartPage
+              onSubmit={orderUp}
+              cartItems={cartItems}
               onItemChange={(item, val) => {
                 changeItem(item, val, false);
               }}

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express"
-import { createGroup, deleteGroup, getAllGroups } from "./handler/itemGroupHandler"
+import { createGroup, deleteGroup, getAllGroups, getBaseGroups } from "./handler/itemGroupHandler"
 import { createItem, deleteItem, getItems, getOneItem, updateItem } from "./handler/itemHandler"
 import { changeStatus, createOrder, getOrders } from "./handler/orderHandler"
 
@@ -22,6 +22,10 @@ export const Routes: IRoute[] = [
     {
         method: 'get',
         url: '/item-group',
+        handler: [getBaseGroups]
+    }, {
+        method: 'get',
+        url: '/admin/item-group',
         handler: [getAllGroups]
     }, {
         method: 'post',
@@ -46,20 +50,20 @@ export const Routes: IRoute[] = [
     {
         method: 'post',
         url: '/item',
-        handler: [createItem]
+        handler: [isAdmin, createItem]
     },
     {
         method: 'patch',
         url: '/item/:id',
-        handler: [updateItem]
+        handler: [isAdmin, updateItem]
     },
     {
         method: 'delete',
         url: '/item/:id',
-        handler: [deleteItem]
+        handler: [isAdmin, deleteItem]
     },
     {
-        method: 'get',
+        method: 'post',
         url: '/order',
         handler: [createOrder]
     },
@@ -79,8 +83,8 @@ export const Routes: IRoute[] = [
         handler: [isAdmin, changeStatus('DELIVERED')]
     },
     {
-        method: 'post',
+        method: 'get',
         url: '/order',
-        handler: [getOrders]
+        handler: [isAdmin, getOrders]
     },
 ]

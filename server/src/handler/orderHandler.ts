@@ -4,6 +4,7 @@ import { AppDataSource } from "../data-source";
 import { Order } from "../entity/Order";
 import { OrderItem } from "../entity/OrderItem";
 import { Item } from "../entity/Item";
+import { User } from "../entity/User";
 
 interface OrderItemDto {
   itemId: number,
@@ -19,11 +20,12 @@ interface OrderDto {
 export async function createOrder(req: Request, res: Response) {
 
   const body = req.body as OrderDto;
-
+  const user = (req.session as any).user as User;
   const createdOrder = await AppDataSource.manager.transaction(async manager => {
     const order = await manager.save(Order, {
       status: 'PENDING',
       createdAt: new Date(),
+      user,
       targetLocation: body.targetLocation,
       orderItems: []
     });
@@ -43,7 +45,13 @@ export async function createOrder(req: Request, res: Response) {
 
   });
 
-  res.json(createdOrder);
+  res.json({
+    ...createdOrder,
+    orderItems: createdOrder.orderItems.map(element => {
+      const { order, ...rest } = element;
+      return rest
+    })
+  });
 }
 
 const typesMap = {
@@ -80,12 +88,10 @@ export function changeStatus(status: 'ACCEPTED' | 'REJECTED' | 'DELIVERED') {
 }
 
 export async function getOrders(req: Request, res: Response) {
-  const admin = (req.session as any).user.admin;
-
   const orders = await AppDataSource.getRepository(Order).find({
     relations: {
       orderItems: true,
-      user: admin,
+      user: true,
     }
   })
   res.json(orders);

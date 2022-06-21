@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FlexboxGrid } from 'rsuite';
 import FlexboxGridItem from 'rsuite/esm/FlexboxGrid/FlexboxGridItem';
 import useGet from '../hooks/useGet'
-import { Item, ItemGroup } from '../types'
+import { Item, ItemGroup, ItemsRes } from '../types'
 import GroupFilter from './GroupFilter';
 import ItemCard from './ItemCard';
 
@@ -16,11 +16,6 @@ function flattenGroups(itemGroups: ItemGroup[]) {
     }
   }
   return arr;
-}
-
-interface ItemsRes {
-  data: Item[],
-  total: number
 }
 
 

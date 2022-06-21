@@ -1,5 +1,6 @@
 .text-center{
   text-align: center;
+  margin:10px 0;
 }
 
 .app-container{
@@ -11,4 +12,13 @@
   padding: 20px;
   border: 1px #142041 solid;
   border-radius: 10px;
+}
+.fluid>div{
+  width: 100%;
+}
+.fluid>div>div{
+  width: 100% !important;
+}
+.fluid{
+  width: 100%;
 }
