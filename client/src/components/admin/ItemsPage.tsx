@@ -1,15 +1,17 @@
 import axios from 'axios';
 import React, { useState } from 'react'
-import { Button, ButtonGroup, ButtonToolbar, Table } from 'rsuite'
+import { Button, ButtonGroup, ButtonToolbar, Pagination, Table } from 'rsuite'
 import useGet from '../../hooks/useGet';
 import { Item, ItemGroup, ItemsRes } from '../../types';
 import { transformGroups } from '../../util';
 import ItemForm from './ItemForm';
+const pageSizeOptions = [10, 20, 30, 50]
+const layout = ["total", "-", "limit", "pager"] as any;
 
 export default function ItemsPage() {
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(20);
-  const [openModal, setOpenModal] = useState(true);
+  const [openModal, setOpenModal] = useState(false);
   const [groups, setGroups] = useGet<ItemGroup[]>('/admin/item-group', []);
   const [selectedItemId, setSelectedItemId] = useState(0);
   const [items, setItems] = useGet<ItemsRes>('/item', { data: [], total: 0 }, {
@@ -38,7 +40,13 @@ export default function ItemsPage() {
         }}
         item={selectedItem}
         onSubmit={async val => {
-
+          if (!selectedItem) {
+            await axios.post('/item', val)
+          } else {
+            await axios.patch('/item/' + selectedItemId, val)
+          }
+          setSelectedItemId(0);
+          refetch();
         }}
       />
       <h1 className='text-center' >Items</h1>
@@ -97,6 +105,23 @@ export default function ItemsPage() {
           </Table.Cell>
         </Table.Column>
       </Table>
+      <Pagination
+        next
+        first
+        last
+        activePage={page + 1}
+        onChangePage={(page) => {
+          setPage(page - 1);
+        }}
+        size="xs"
+        layout={layout}
+        total={items.total}
+        maxButtons={5}
+        ellipsis
+        limitOptions={pageSizeOptions}
+        limit={size}
+        onChangeLimit={setSize}
+      />
     </div>
   )
 }

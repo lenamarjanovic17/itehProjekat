@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import { createGroup, deleteGroup, getAllGroups, getBaseGroups } from "./handler/itemGroupHandler"
-import { createItem, deleteItem, getItems, getOneItem, updateItem } from "./handler/itemHandler"
+import { createItem, deleteItem, getItems, getOneItem, getSalesReport, updateItem } from "./handler/itemHandler"
 import { changeStatus, createOrder, getOrders } from "./handler/orderHandler"
 
 interface IRoute {
@@ -86,5 +86,10 @@ export const Routes: IRoute[] = [
         method: 'get',
         url: '/order',
         handler: [isAdmin, getOrders]
+    },
+    {
+        method: 'get',
+        url: '/sales',
+        handler: [isAdmin, getSalesReport]
     },
 ]

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { Form, Modal, Input, Button, InputPicker, Uploader } from 'rsuite'
+import { Form, Modal, Input, Button, InputPicker, Uploader, Schema, IconButton } from 'rsuite'
 import { Item, ItemGroup, Specification } from '../../types'
 import SpecificationTable from '../SpecificationTable';
 import ImageIcon from '@rsuite/icons/Image';
+import PlusIcon from '@rsuite/icons/Plus';
 interface Props {
   item?: Item,
   open: boolean,
@@ -13,10 +14,17 @@ interface Props {
 //@ts-ignore
 const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />);
 
+const model = Schema.Model({
+  name: Schema.Types.StringType().isRequired(),
+  description: Schema.Types.StringType(),
+  price: Schema.Types.NumberType().isRequired(),
+  groupId: Schema.Types.NumberType()
+})
 
 export default function ItemForm(props: Props) {
   const [specification, setSpecification] = useState<Specification>({})
-  const [formState, setFormState] = useState<Partial<Item>>({});
+  const [formState, setFormState] = useState<Partial<Item & { groupId: number }>>({});
+  const [imageUrl, setImageUrl] = useState('');
   useEffect(() => {
     if (!props.open) {
       return;
@@ -24,10 +32,15 @@ export default function ItemForm(props: Props) {
     if (!props.item) {
       setSpecification({});
       setFormState({});
+      setImageUrl('')
       return;
     }
-    const { specification, ...rest } = props.item
-    setFormState(rest);
+    const { specification, imageUrl, ...rest } = props.item
+    setFormState({
+      ...rest,
+      groupId: rest.itemGroup?.id
+    });
+    setImageUrl(imageUrl)
     setSpecification(specification);
   }, [props.open, props.item])
   return (
@@ -45,7 +58,26 @@ export default function ItemForm(props: Props) {
       </Modal.Header>
       <Modal.Body style={{ display: 'flex', justifyContent: 'space-between' }}>
         <div style={{ flex: 1, paddingRight: "20px" }}>
-          <Form fluid>
+          <Form
+            model={model}
+            formValue={formState}
+            onChange={val => {
+              setFormState(val);
+            }}
+            onSubmit={async (c) => {
+              console.log(c)
+              if (!c) {
+                return;
+              }
+              await props.onSubmit({
+                ...formState,
+                specification,
+                itemGroup: props.itemGroups.find(e => e.id === formState.groupId),
+                imageUrl
+              })
+              props.onClose();
+            }}
+            fluid>
             <Form.Group>
               <Form.ControlLabel>Name</Form.ControlLabel>
               <Form.Control name='name' />
@@ -74,21 +106,61 @@ export default function ItemForm(props: Props) {
           </Form>
         </div>
         <div style={{ flex: 1, paddingLeft: "10px", paddingRight: "10px" }}>
+          <IconButton appearance='primary' icon={<PlusIcon />} onClick={() => {
+            setSpecification(prev => {
+              return {
+                ...prev,
+                ['spec' + Object.keys(prev).length]: ''
+              }
+            })
+          }} />
           <SpecificationTable
             specification={specification}
+            editing
+            onEditValue={(specName, val) => {
+              setSpecification(prev => {
+                return {
+                  ...prev,
+                  [specName]: val
+                }
+              })
+            }}
+            onEditName={(specName, newName) => {
+              setSpecification(prev => {
+                const newState = { ...prev };
+                newState[newName] = newState[specName];
+                delete newState[specName];
+                return newState;
+              })
+            }}
+            onDelete={specName => {
+              setSpecification(prev => {
+                const newState = { ...prev };
+                delete newState[specName];
+                return newState;
+              })
+            }}
           />
         </div>
         <div style={{ flex: 1, paddingLeft: "20px", }}>
-          <Uploader className='fluid' multiple listType="picture" action="//jsonplaceholder.typicode.com/posts/">
+          <Uploader
+            draggable
+            action='https://localhost:8000/upload'
+            name='img'
+            onSuccess={(response) => {
+              setImageUrl(response.fileUrl)
+            }}
+            className='fluid'
+          >
             <div
               style={{
-                backgroundImage: `url(${props.item?.imageUrl || ''})`,
+                backgroundImage: `url(${imageUrl || ''})`,
                 backgroundSize: 'cover',
                 height: '300px'
               }}
             >
               {
-                !props.item?.imageUrl && (
+                !imageUrl && (
                   <ImageIcon />
                 )
               }

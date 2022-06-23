@@ -5,6 +5,7 @@ import AdminNavbar from './AdminNavbar'
 import ItemGroupPage from './ItemGroupPage'
 import ItemsPage from './ItemsPage'
 import OrderMonitoring from './OrderMonitoring'
+import StatisticsPage from './StatisticsPage'
 
 
 interface Props {
@@ -20,6 +21,7 @@ export default function AdminApp(props: Props) {
         <Route path='/item-group' element={<ItemGroupPage />} />
         <Route path='/' element={<OrderMonitoring />} />
         <Route path='/item' element={<ItemsPage />} />
+        <Route path='/statistics' element={<StatisticsPage />} />
       </Routes>
     </BrowserRouter>
   )

@@ -61,6 +61,11 @@ AppDataSource.initialize().then(async () => {
         req.session.save();
         res.json(user);
     })
+    app.post('/upload', uplaodMiddleware, renameFile, (req, res) => {
+        res.json({
+            fileUrl: (req as any).fileUrl
+        })
+    })
 
     app.use((request, response, next) => {
         const user = (request.session as any).user as User | undefined;
@@ -80,11 +85,6 @@ AppDataSource.initialize().then(async () => {
         res.sendStatus(204);
     })
 
-    app.post('/upload', uplaodMiddleware, renameFile('img'), (req, res) => {
-        res.json({
-            fileUrl: (req as any).fileUrl
-        })
-    })
     app.use('/img', express.static('img', {
         extensions: ['png', 'jpg', 'jpeg']
     }))

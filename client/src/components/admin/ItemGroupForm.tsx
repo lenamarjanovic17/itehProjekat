@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Form, Modal, InputPicker, Button } from 'rsuite'
+import { Form, Modal, InputPicker, Button, Schema } from 'rsuite'
 import { ItemGroup, Order } from '../../types'
 
 interface Props {
@@ -12,6 +12,12 @@ const initial = {
   name: '',
   parentGroup: undefined,
 }
+
+const model = Schema.Model({
+  name: Schema.Types.StringType().isRequired(),
+  parentGroup: Schema.Types.NumberType().isRequired()
+})
+
 export default function ItemGroupForm(props: Props) {
   const [formValue, setFormValue] = useState<Partial<ItemGroup>>(initial)
   return (
@@ -25,6 +31,7 @@ export default function ItemGroupForm(props: Props) {
         <Modal.Body>
           <Form
             fluid
+            model={model}
             formValue={formValue}
             onChange={val => {
               setFormValue(val);

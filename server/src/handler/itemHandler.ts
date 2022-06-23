@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { Item } from "../entity/Item";
 import { ItemGroup } from "../entity/ItemGroup";
+import { Order } from "../entity/Order";
+import { OrderItem } from "../entity/OrderItem";
 
 export async function getItems(req: Request, res: Response) {
 
@@ -101,4 +103,18 @@ export async function deleteItem(req: Request, res: Response) {
     id: Number(req.params.id)
   })
   res.sendStatus(204);
+}
+
+export async function getSalesReport(req: Request, res: Response) {
+  const result = await AppDataSource.getRepository(Item)
+    .createQueryBuilder('item')
+    .select('item.id', 'id')
+    .addSelect('item.name', 'name')
+    .addSelect('COALESCE(SUM(orderItem.count), 0)', 'items')
+    .addSelect('COALESCE(COUNT(orderItem.id), 0)', 'orders')
+    .leftJoin(OrderItem, 'orderItem', 'orderItem.item.id = item.id')
+    .groupBy("item.id")
+    .getRawMany()
+
+  res.json(result);
 }

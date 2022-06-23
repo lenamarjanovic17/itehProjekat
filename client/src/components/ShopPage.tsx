@@ -42,7 +42,7 @@ export default function ShopPage() {
 
       <FlexboxGridItem colspan={1}>
       </FlexboxGridItem>
-      <FlexboxGridItem colspan={5}>
+      <FlexboxGridItem colspan={17}>
         <h2 style={{ textTransform: 'capitalize', textAlign: 'center' }}>
           {getGroupBreadcrumb(flattened.find(e => e.id == selectedGroupId)).substring(3)}
         </h2>
@@ -57,8 +57,8 @@ export default function ShopPage() {
           {
             (items?.data || []).map(item => {
               return (
-                <div key={item.id} style={{ flex: '1' }}>
-                  <Link to={`/item/${item.id}`}>
+                <div key={item.id} style={{ flex: '1', paddingRight: '40px', height: '100%' }}>
+                  <Link style={{ height: '100%' }} to={`/item/${item.id}`}>
                     <ItemCard item={item} />
                   </Link>
                 </div>
